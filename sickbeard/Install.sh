@@ -57,14 +57,14 @@ else
 fi
 
 ## Add systemd file
-if [ -e /etc/systemd/system/${USER}.servicex ]; then
-	echo "Sickbeard service already exists."
+if [ -e /etc/systemd/system/${USER}.service ]; then
+	echo "Service for ${USER} already exists."
 else
-	echo "Adding sickbeard service to systemd."
-	echo "Customising sickbeard.service"
+	echo "Adding ${USER} service to systemd."
+	echo "Customising ${USER}.service"
 	cp Service.tpl ${USER}.service
-	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# sickbeard.service
-	sed -i s#ExecStop=xxxx#ExecStop=/usr/bin/docker\ stop\ ${USER}# sickbeard.service
+	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# ${USER}.service
+	sed -i s#ExecStop=xxxx#ExecStop=/usr/bin/docker\ stop\ ${USER}# ${USER}.service
 	echo "Copying file to /etc/systemd/system"
 	cp ${USER}.service /etc/systemd/system/
 	echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."
@@ -76,7 +76,7 @@ else
 fi
 
 ## Finish
-echo "Congratulations.  Sickbeard should now be installed and configured."
+echo "Congratulations  You should now have ${USER} installed and configured."
 echo "Please read the file Readme.md for more information."
 
 

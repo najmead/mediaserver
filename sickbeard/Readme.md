@@ -2,7 +2,7 @@
 
 ## The Basics
 
-Please read the script Install.sh, customise the parameters according to your preferences and then run it.  Running Install.sh will take the Docker.tpl and create a customised dockerfile, and then build a docker image for sickbeard.  It will also take the Service.tpl and create a sickbeard.service to be used by systemd, install it, and set sickbeard to run automatically.
+Please read the script ``Install.sh``, customise the parameters according to your preferences and then run it.  Running Install.sh will take the Docker.tpl and create a customised dockerfile, and then build a docker image for sickbeard.  It will also take the Service.tpl and create a sickbeard.service to be used by systemd, install it, and set sickbeard to run automatically.
 
 ## WARNING
 
@@ -18,11 +18,11 @@ A group called media is also created.  Again, it is created on both the host sys
 
 ## Configuration folder
 
-In order for configuration data to remain persistent, the Install.sh script will create a directory on the host system for configs, and share it with the docker image.  By default, the config directory is /etc/downloaders/sickbeard.
+In order for configuration data to remain persistent, the Install.sh script will create a directory on the host system for configs, and share it with the docker image.  By default, the config directory is ``/etc/downloaders/sickbeard``.
 
 ## Data
 
-It is assumed that you have your TV shows stored in a single data directory on the host system.  By default, this is assumed to be /media, but it can be customised in the Install.sh script.  As with the configuration folder, it will be shared between the host and the docker container.
+It is assumed that you have your TV shows stored in a single data directory on the host system.  By default, this is assumed to be ``/media``, but it can be customised in the Install.sh script.  As with the configuration folder, it will be shared between the host and the docker container.
 
 ## Dockerfile
 
@@ -36,15 +36,15 @@ The final step of the Install.sh script is to customise the Service.tpl to creat
 
 If the image build fails, you may want to edit the Dockerfile and build it mannually.  Use the command;
 
-docker build -t sickbeard .
+``docker build -t sickbeard .``
 
 To test the image and run it interactively, run;
 
-docker run -i -t -v /etc/sickbeard:/etc/sickbeard -v /media:/media -p 8081:8081 --name sickbeard sickbeard
+``docker run -i -t -v /etc/sickbeard:/etc/sickbeard -v /media:/media -p 8081:8081 --name sickbeard sickbeard``
 
 To try and diagnose issues with the image, you can override the ENTRYPOINT and attach to the running image with bash, using the following;
 
-docker run -v /etc/sickbeard:/etc/sickbeard -v /media:/media --interactive --tty --entrypoint=/bin/bash sickbeard --login
+``docker run -v /etc/sickbeard:/etc/sickbeard -v /media:/media --interactive --tty --entrypoint=/bin/bash sickbeard --login``
 
 
 

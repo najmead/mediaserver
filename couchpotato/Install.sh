@@ -64,9 +64,9 @@ fi
 TEMP_CONT=$RANDOM
 echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
 docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
-echo "Let's have a little snooze"
-sleep 60
-echo "Stop the temporary container ( ${TEMP_CONT} )"
+echo "Let's have a little snooze, to give ${USER} time to setup."
+sleep 10
+echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 docker stop ${TEMP_CONT}
 echo "Replace the default port with ${SERVERPORT}."
 sed -i s#port\ =\ 5050#port\ =\ ${SERVERPORT}# ${CONFIGDIR}/settings.conf
@@ -80,8 +80,10 @@ else
 	echo "Adding ${USER} service to systemd."
 	echo "Customising ${USER}.service"
 	cp Service.tpl ${USER}.service
+	sed -i s#Description=xxxx#Description=${USER}# ${USER}.servic
 	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
-	sed -i s#ExecStop=xxxx#ExecStop=/usr/bin/docker\ stop\ ${USER}# ${USER}.service
+	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
+	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
 	echo "Copying file to /etc/systemd/system"
 	cp ${USER}.service /etc/systemd/system/
 	echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."

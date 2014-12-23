@@ -31,4 +31,4 @@ EXPOSE ${SERVERPORT}
 
 USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/headphones/Headphones.py", "--port=xxxx", "--datadir=xxxx"]
+ENTRYPOINT ["/usr/bin/python", "/opt/headphones/Headphones.py", "--datadir=xxxx"]

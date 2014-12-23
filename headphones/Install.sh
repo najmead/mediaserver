@@ -45,7 +45,7 @@ else
 	echo "Docker image doesn't exist, creating it..."
 	echo "Customising Dockerfile"
 	cp Dockerfile.tpl Dockerfile
-	
+
 	## Set environment variables in Dockerfile
 	sed -i s#ENV\ USER\ xxxx#ENV\ USER\ ${USER}# Dockerfile
 	sed -i s#ENV\ SERVERPORT\ xxxx#ENV\ SERVERPORT\ ${SERVERPORT}# Dockerfile
@@ -53,14 +53,30 @@ else
 	sed -i s#ENV\ DATADIR\ xxxx#ENV\ DATADIR\ ${DATADIR}# Dockerfile
 	sed -i s#ENV\ GROUP\ xxxx#ENV\ GROUP\ ${GROUP}# Dockerfile
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
-	
+
 	## Customise ENTRYPOINT in Dockerfile
 	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
-	sed -i s#--port=xxxx#--port=${SERVERPORT}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
 
+
+## Customise config for port
+if [ -e ${CONFIGDIR}/config.ini ]; then
+	echo "Config file already exists, so I won't touch it.  Double check that the port in the config file matches the specified port, ${SERVERPORT}."
+else
+	TEMP_CONT=$RANDOM
+	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
+	docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
+	echo "Let's have a little snooze, to give ${USER} time to setup."
+	sleep 10
+	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
+	docker stop ${TEMP_CONT}
+	echo "Replace the default port with ${SERVERPORT}."
+	sed -i s#http_port\ =\ 8181#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
+	echo "Snooze a little bit more so I can check some things."
+	sleep 60
+fi
 
 ## Add systemd file
 if [ -e /etc/systemd/system/${USER}.service ]; then

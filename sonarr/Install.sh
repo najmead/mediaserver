@@ -69,7 +69,7 @@ sleep 10
 echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 docker stop ${TEMP_CONT}
 echo "Replace the default port with ${SERVERPORT}."
-sed -i s#<Port>8989</Port>#<Port>${SERVERPORT}</Port># ${CONFIGDIR}/settings.conf
+sed -i s#\<Port\>8989#\<Port\>${SERVERPORT}# ${CONFIGDIR}/.config/NzbDrone/config.xml 
 echo "Snooze a little bit more"
 sleep 10
 

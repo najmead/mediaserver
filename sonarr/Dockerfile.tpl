@@ -17,9 +17,9 @@ RUN apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\
 	rm -rf /tmp/*
 
-RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nol
-ogin -g ${GROUP} ${USER}
-RUN chown -R ${USER}:${GROUP} /opt/sabnzbd
+RUN mkdir -p ${CONFIGDIR}
+RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} -d ${CONFIGDIR} ${USER}
+RUN chown -R ${USER}:${GROUP} /opt/NzbDrone
 RUN mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
 RUN chmod u+rw ${CONFIGDIR}
 

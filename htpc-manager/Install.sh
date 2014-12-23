@@ -67,8 +67,10 @@ else
 	echo "Adding ${USER} service to systemd."
 	echo "Customising ${USER}.service"
 	cp Service.tpl ${USER}.service
+	sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
 	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
-	sed -i s#ExecStop=xxxx#ExecStop=/usr/bin/docker\ stop\ ${USER}# ${USER}.service
+	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
+	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
 	echo "Copying file to /etc/systemd/system"
 	cp ${USER}.service /etc/systemd/system/
 	echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."

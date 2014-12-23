@@ -25,5 +25,5 @@ EXPOSE ${SERVERPORT}
 
 USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/htpc/Htpc.py", "--port=xxxx", "--datadir=xxxx"]
+ENTRYPOINT ["/usr/bin/python", "/opt/htpc/Htpc.py", "--datadir=xxxx"]
 

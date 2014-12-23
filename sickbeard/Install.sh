@@ -55,6 +55,21 @@ else
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
+if [ -e ${CONFIGDIR}/config.ini ]; then
+	echo "Config file already exists.  Double check that the port listed in the config matches specified port, ${SICKBEARPORT}."
+else
+	TEMP_CONT=$RANDOM
+	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate"
+	docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
+	echo "Snooze for a moment, to give ${USER} time to setup."
+	sleep 10
+	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
+	docker stop ${TEMP_CONT}
+	echo "Replace the default port with ${SICKBEARDPORT}."
+	sed -i s#web_port\ =\ 8081#web_port\ =\ ${SICKBEARDPORT}# ${CONFIGDIR}/config.ini
+	echo "Snooze a little bit more"
+	sleep 60
+fi
 
 ## Add systemd file
 if [ -e /etc/systemd/system/${USER}.service ]; then

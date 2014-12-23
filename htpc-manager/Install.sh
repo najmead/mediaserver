@@ -54,11 +54,27 @@ else
 
 	echo "Setting ENTRYPOINT"
 	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
-	sed -i s#--port=xxxx#--port=${SERVERPORT}# Dockerfile
 
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
+
+if [ -e ${CONFIGDIR}/database.db ]; then
+	echo "Config database already exists, so I won't touch it.  Double check that the port list in the config matches the specified port, ${SERVERPORT}."
+else
+	TEMP_CONT=$RANDOM
+	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate a config."
+	docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
+	echo "Snooze for a moment, to give ${USER} time to setup."
+	sleep 10
+	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
+	docker stop ${TEMP_CONT}
+	echo "Insert the specified port ${SERVERPORT} into the config database."
+	sqlite3 ${CONFIGDIR}/database.db "insert into setting (key, val) values ('app_port', ${SERVERPORT});"
+	echo "Snooze a little bit more so I can check some things."
+	sleep 60
+fi
+
 
 ## Add systemd file
 if [ -e /etc/systemd/system/${USER}.service ]; then

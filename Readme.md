@@ -17,7 +17,7 @@ The following services are in progress, or mostly completed;
 #### Downloaders
 - SABnzbd+ (Port 8000) [Complete]
 - NZBGet (Port 8001) [To be done]
-- Deluge (Port 8002) [To be done]
+- Deluge (Port 8002) [Complete]
 - Transmission (Port 8003) [To be done]
 
 #### Managers

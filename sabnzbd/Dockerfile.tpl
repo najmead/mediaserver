@@ -34,5 +34,5 @@ EXPOSE ${SERVERPORT}
 
 USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/sabnzbd/SABnzbd.py", "-f xxxx", "--server", ":xxxx"]
+ENTRYPOINT ["/usr/bin/python", "/opt/sabnzbd/SABnzbd.py", "--config-file=xxxx", "--server", ":xxxx"]
 

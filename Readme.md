@@ -9,7 +9,7 @@ The following services are in progress, or mostly completed;
 
 #### Content Finders
 - Sickbeard 	--> 9000
-- NZBDrone	--> 9001
+- Sonarr	--> 9001
 - Couchpotato	--> 9002
 - Headphones	--> 9003
 - Mylar		--> 9004

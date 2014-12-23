@@ -4,7 +4,7 @@
 GROUP="media"
 GROUPID="10000"
 USER="htpc"
-SERVERPORT="8000"
+SERVERPORT="9000"
 CONFIGDIR="/etc/downloaders/${USER}"
 ##DATADIR="/media"
 ###############################################

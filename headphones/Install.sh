@@ -4,7 +4,7 @@
 GROUP="media"
 GROUPID="10000"
 USER="headphones"
-SERVERPORT="8083"
+SERVERPORT="9003"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################

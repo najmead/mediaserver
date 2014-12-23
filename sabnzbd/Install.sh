@@ -4,7 +4,7 @@
 GROUP="media"
 GROUPID="10000"
 USER="sabnzbd"
-SERVERPORT="8080"
+SERVERPORT="8000"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################

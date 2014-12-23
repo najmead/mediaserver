@@ -4,7 +4,7 @@
 GROUP="media"
 GROUPID="10000"
 USER="sickbeard"
-SICKBEARDPORT="8081"
+SICKBEARDPORT="9000"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################

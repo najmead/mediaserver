@@ -21,8 +21,8 @@ The following services are in progress, or mostly completed;
 - Transmission	--> 8003
 
 #### Managers
-- HTPC Manager	--> 9000
-- Maraschino	--> 9001
+- HTPC Manager	--> 7000
+- Maraschino	--> 7001
 
 #### Content Servers
 - Subsonic

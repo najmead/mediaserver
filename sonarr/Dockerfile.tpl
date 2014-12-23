@@ -10,8 +10,8 @@ ENV DATADIR xxxx
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FDA5DFFC
 RUN echo "deb http://apt.sonarr.tv/ master main" | tee -a /etc/apt/sources.list
-RUN apt-get update && apt-get dist-upgrade
-RUN apt-get install nzbdrone
+RUN apt-get -q update && apt-get -qy --force-yes dist-upgrade
+RUN apt-get -qy install nzbdrone 
 
 RUN apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\

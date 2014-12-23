@@ -4,7 +4,7 @@
 GROUP="media"
 GROUPID="10000"
 USER="couchpotato"
-SERVERPORT="8082"
+SERVERPORT="9002"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################

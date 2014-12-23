@@ -56,7 +56,7 @@ else
 	
 	## Customise ENTRYPOINT in Dockerfile
 	sed -i s#-f\ xxxx#-f\ ${CONFIGDIR}# Dockerfile
-	sed -i s#--server\ :xxxx#--server\ :${SERVERPORT}# Dockerfile
+	sed -i s#\:xxxx#\:${SERVERPORT}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi

@@ -33,5 +33,11 @@ Each of the applications here is built using docker.  For more information, chec
 
 ##Prerequisites
 
-There's some stuff that probably needs to be installed before these scripts will work.  I'll add that information as it comes to me.
+There's some stuff that probably needs to be installed before these scripts will work.  I'll add that information as it comes to me. 
+
+Here's the steps I followed...
+
+Download and install the Debian Jessie netinstall.  Run the installation, and de-select most of the options (no need for a desktop environment), with the exception of ssh (this will be useful).  Once the install is complete, ssh into the new server.  Install the packages git and docker.io (you may need to reboot after installing docker).  Clone the this repository.  Then pick the various packages you want, and run the Install.sh script for each of them.
+
+
 

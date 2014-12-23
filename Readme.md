@@ -8,24 +8,24 @@ Here are a series of scripts I'm working on to automate the build of my home ser
 The following services are in progress, or mostly completed;
 
 #### Content Finders
-- Sickbeard 	--> 9000
-- Sonarr	--> 9001
-- Couchpotato	--> 9002
-- Headphones	--> 9003
-- Mylar		--> 9004
+- Sickbeard (Port 9000) [Complete]
+- Sonarr / NzbDrone (Port 9001) [Complete]
+- Couchpotato (Port 9002) [Complete]
+- Headphones (Port 9003) [Complete]
+- Mylar (Port 9004) [Complete]
 
 #### Downloaders
-- SABnzbd+	--> 8000
-- NZBGet	--> 8001
-- Deluge	--> 8002
-- Transmission	--> 8003
+- SABnzbd+ (Port 8000) [Complete]
+- NZBGet (Port 8001) [To be done]
+- Deluge (Port 8002) [To be done]
+- Transmission (Port 8003) [To be done]
 
 #### Managers
-- HTPC Manager	--> 7000
-- Maraschino	--> 7001
+- HTPC Manager (Port 7000) [Complete]
+- Maraschino (Port 7001) [To be done]
 
 #### Content Servers
-- Subsonic
+- Subsonic (Port ????) [To be done]
 
 ##Docker
 

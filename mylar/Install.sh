@@ -61,6 +61,22 @@ else
 	docker build -t "${USER}" .
 fi
 
+## Customise config for port
+if [ -e ${CONFIGDIR}/config.ini ]; then
+	echo "Config file already exists, so I won't touch it.  Double check that the port in the config file matches the specified port, ${SERVERPORT}."
+else
+	TEMP_CONT=$RANDOM
+	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
+	docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
+	echo "Let's have a little snooze, to give ${USER} time to setup."
+	sleep 10
+	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
+	docker stop ${TEMP_CONT}
+	echo "Replace the default port with ${SERVERPORT}."
+	sed -i s#http_port\ =\ 8090#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
+	echo "Snooze a little bit more so I can check some things."
+	sleep 60
+fi
 
 ## Add systemd file
 if [ -e /etc/systemd/system/${USER}.service ]; then

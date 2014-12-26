@@ -9,7 +9,7 @@ ENV CONFIGDIR xxxx
 
 ## Take care of dependencies
 RUN apt-get update && apt-get -qy --force-yes dist-upgrade
-RUN apt-get install git python2.7 python-dev libjpeg8 libjpeg8-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip -qy
+RUN apt-get install git python2.7 python-dev libjpeg8 libjpeg8-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip sqlite3 -qy
 RUN pip install pillow
 RUN git clone https://github.com/styxit/HTPC-Manager /opt/htpc
 

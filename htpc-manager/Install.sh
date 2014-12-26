@@ -70,6 +70,8 @@ else
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
 	echo "Insert the specified port ${SERVERPORT} into the config database."
+	echo "I'll need sqlite3"
+	apt-get update && apt-get install sqlite3 -qy
 	sqlite3 ${CONFIGDIR}/database.db "insert into setting (key, val) values ('app_port', ${SERVERPORT});"
 	echo "Snooze a little bit more so I can check some things."
 	sleep 60

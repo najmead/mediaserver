@@ -5,6 +5,7 @@ GROUP="media"
 GROUPID="10000"
 USER="sonarr"
 SERVERPORT="9001"
+URLBASE="sonarr"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################
@@ -61,17 +62,22 @@ else
 fi
 
 ## Customise config for port
-TEMP_CONT=$RANDOM
-echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
-docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
-echo "Let's have a little snooze, to give ${USER} time to setup."
-sleep 10
-echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
-docker stop ${TEMP_CONT}
-echo "Replace the default port with ${SERVERPORT}."
-sed -i s#\<Port\>8989#\<Port\>${SERVERPORT}# ${CONFIGDIR}/.config/NzbDrone/config.xml 
-echo "Snooze a little bit more"
-sleep 10
+if [  -e ${CONFIGDIR}/.config/NzbDrone/config.xml ]; then
+	echo "Config already exists in ${CONFIGDIR}/.config/NzbDrone/config.xml so I won't touch it.  Double check that the port in the config matches the specified port ${SERVERPORT}"
+else
+	TEMP_CONT=$RANDOM
+	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
+	docker run -d -v ${CONFIGDIR}:${CONFIGDIR} --name=${TEMP_CONT} ${USER}
+	echo "Let's have a little snooze, to give ${USER} time to setup."
+	sleep 10
+	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
+	docker stop ${TEMP_CONT}
+	echo "Replace the default port with ${SERVERPORT}."
+	sed -i s#\<Port\>8989#\<Port\>${SERVERPORT}# ${CONFIGDIR}/.config/NzbDrone/config.xml 
+	sed -i s#\<UrlBase\>#\<UrlBase\>${URLBASE}# ${CONFIGDIR}/.config/NzbDrone/config.xml
+	echo "Snooze a little bit more"
+	sleep 10
+fi
 
 ## Add systemd file
 if [ -e /etc/systemd/system/${USER}.service ]; then

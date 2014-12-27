@@ -5,6 +5,7 @@ GROUP="media"
 GROUPID="10000"
 USER="headphones"
 SERVERPORT="9003"
+URLBASE="headphones"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################
@@ -72,8 +73,9 @@ else
 	sleep 10
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
-	echo "Replace the default port with ${SERVERPORT}."
+	echo "Replace the default port with ${SERVERPORT}, and set url base to ${URLBASE}"
 	sed -i s#http_port\ =\ 8181#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
+	sed -i s#http_root\ =\ \/#http_root\ =\ \/${URLBASE}# ${CONFIGDIR}/config.ini
 	echo "Snooze a little bit more so I can check some things."
 	sleep 60
 fi

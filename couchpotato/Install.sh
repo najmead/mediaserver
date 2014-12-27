@@ -5,6 +5,7 @@ GROUP="media"
 GROUPID="10000"
 USER="couchpotato"
 SERVERPORT="9002"
+URLBASE="cp"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################
@@ -73,6 +74,7 @@ else
 	docker stop ${TEMP_CONT}
 	echo "Replace the default port with ${SERVERPORT}."
 	sed -i s#port\ =\ 5050#port\ =\ ${SERVERPORT}# ${CONFIGDIR}/settings.conf
+	sed -i s#url_base\ =#url_base\ =\ $URLBASE# ${CONFIGDIR}/settings.conf
 	echo "Snooze a little bit more so I can check some things."
 	sleep 60
 fi

@@ -5,6 +5,7 @@ GROUP="media"
 GROUPID="10000"
 USER="htpc"
 SERVERPORT="7000"
+URLBASE="htpc"
 CONFIGDIR="/etc/downloaders/${USER}"
 ##DATADIR="/media"
 ###############################################
@@ -69,15 +70,21 @@ else
 	sleep 10
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
-	echo "Insert the specified port ${SERVERPORT} into the config database."
+	echo "Insert the specified port ${SERVERPORT} and the URL path /${URLBASE} into the config database."
 	echo "I'll need sqlite3..."
-	type sqlite3 > /dev/null
-	if [ %? -eq 0 ]; then
+	s=$(which sqlite3 > /dev/null;echo $?)
+	if [ $s -eq 0 ]; then
 		echo "...you already have it installed"
 	else
 		echo "...I'll install it temporarily."
 		apt-get update && apt-get install sqlite3 -qy
-		sqlite3 ${CONFIGDIR}/database.db "insert into setting (key, val) values ('app_port', ${SERVERPORT});"
+	fi
+	sqlite3 ${CONFIGDIR}/database.db "insert into setting (key, val) values ('app_port', ${SERVERPORT});"
+	sqlite3 ${CONFIGDIR}/database.db "insert into setting (key, val) values ('app_webdir', '/${URLBASE}');"
+	if [ $s -eq 0 ]; then
+		echo "No cleanup required." 
+	else
+		echo "Cleaning up."
 		apt-get remove -qy sqlite3
 	fi
 	echo "Snooze a little bit more so I can check some things."

@@ -68,7 +68,7 @@ else
 	docker stop ${TEMP_CONT}
 	echo "Replace the default port with ${SICKBEARDPORT}."
 	sed -i s#web_port\ =\ 8081#web_port\ =\ ${SICKBEARDPORT}# ${CONFIGDIR}/config.ini
-	sed -i s#web_root\ =\ \"\"#web_root\ =\ \"${URLBASE}\"# ${CONFIGDIR}/config.ini
+	sed -i s#web_root\ =\ \"\"#web_root\ =\ \"\/${URLBASE}\"# ${CONFIGDIR}/config.ini
 	echo "Snooze a little bit more"
 	sleep 60
 fi

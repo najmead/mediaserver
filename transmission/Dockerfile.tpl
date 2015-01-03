@@ -8,15 +8,15 @@ ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 ENV DATADIR xxxx
 
-RUN apt-get update && apt-get dist-upgrade -qy
-RUN apt-get install transmission-daemon -qy
-RUN apt-get clean &&\
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get dist-upgrade -qy
+RUN DEBIAN_FRONTEND=noninteractive apt-get install transmission-daemon -qy
+RUN DEBIAN_FRONTEND=noninteractive apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\
 	rm -rf /tmp/*
 
-RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} ${USER}
-RUN mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
-RUN chmod u+rw ${CONFIGDIR}
+RUN DEBIAN_FRONTEND=noninteractive groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} ${USER}
+RUN DEBIAN_FRONTEND=noninteractive mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
+RUN DEBIAN_FRONTEND=noninteractive chmod u+rw ${CONFIGDIR}
 
 ## Create Volumes
 VOLUME ${CONFIGDIR}

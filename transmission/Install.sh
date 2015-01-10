@@ -20,20 +20,21 @@ fi
 
 echo	"Setting up user $USER"
 
-if [ -d "$CONFIGDIR" ]; then
-	echo "Directory already exists"
-else
-	echo "Directory doesn't exist, so creating it..."
-	mkdir -p "$CONFIGDIR"
-fi
-
 ## Check to see if user exists, if not, create it.
 getent passwd "${USER}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "User $USER already exists, no need to create."
+	echo "User ${USER} already exists, no need to create."
 else
-	echo "User $USER does not exist, creating it..."
+	echo "User ${USER} does not exist, creating it..."
 	useradd -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+fi
+
+if [ -d "$CONFIGDIR" ]; then
+	echo "Directory already exists. Making sure ownership is correct."
+	chown -R ${USER}:${GROUP} ${CONFIGDIR}
+else
+	echo "Directory doesn't exist, so creating it..."
+	mkdir -p "${CONFIGDIR}"
 	chown -R ${USER}:${GROUP} ${CONFIGDIR}
 fi
 
@@ -55,11 +56,11 @@ else
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 
 	## Customise ENTRYPOINT in Dockerfile
+	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
 	sed -i s#--config-dir=xxxx#--config-dir=${CONFIGDIR}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
-
 
 ## Customise config for port
 if [ -e ${CONFIGDIR}/settings.json ]; then

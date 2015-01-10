@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -8,8 +8,8 @@ ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 ENV DATADIR xxxx
 
-RUN apt-get update && apt-get dist-upgrade
-RUN apt-get install python python-cherrypy git -y
+RUN apt-get update && apt-get dist-upgrade -qy
+RUN apt-get install python python-cherrypy git sudo -qy
 RUN apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\
 	rm -rf /tmp/*
@@ -26,6 +26,6 @@ VOLUME ${DATADIR}
 
 EXPOSE ${SERVERPORT}
 
-USER ${USER}
+#USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/mylar/Mylar.py", "--port=xxxx", "--datadir=xxxx"]
+ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/mylar/Mylar.py", "--port=xxxx", "--datadir=xxxx"]

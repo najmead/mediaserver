@@ -20,14 +20,6 @@ else
 fi
 
 echo	"Setting up user $USER"
-
-if [ -d "$CONFIGDIR" ]; then
-	echo "Directory already exists"
-else
-	echo "Directory doesn't exist, so creating it..."
-	mkdir -p "$CONFIGDIR"
-fi
-
 ## Check to see if user exists, if not, create it.
 getent passwd "${USER}" > /dev/null
 if [ $? -eq 0 ]; then
@@ -35,8 +27,17 @@ if [ $? -eq 0 ]; then
 else
 	echo "User $USER does not exist, creating it..."
 	useradd -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+fi
+
+if [ -d "$CONFIGDIR" ]; then
+	echo "Directory already exists, making sure it has the correct permissions."
+	chown -R $USER:$GROUP $CONFIGDIR
+else
+	echo "Directory doesn't exist, so creating it..."
+	mkdir -p "$CONFIGDIR"
 	chown -R $USER:$GROUP $CONFIGDIR
 fi
+
 
 ## Check to  see if image exists, if not, create it
 docker images|grep -c "${USER}" > /dev/null
@@ -54,6 +55,7 @@ else
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 
 	echo "Setting ENTRYPOINT"
+	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
 	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
 
 	echo "Building image"
@@ -100,7 +102,7 @@ else
 	echo "Customising ${USER}.service"
 	cp Service.tpl ${USER}.service
 	sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
-	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
+	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
 	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
 	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
 	echo "Copying file to /etc/systemd/system"

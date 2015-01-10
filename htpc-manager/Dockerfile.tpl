@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -9,7 +9,7 @@ ENV CONFIGDIR xxxx
 
 ## Take care of dependencies
 RUN apt-get update && apt-get -qy --force-yes dist-upgrade
-RUN apt-get install git python2.7 python-dev libjpeg8 libjpeg8-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip -qy
+RUN apt-get install git python2.7 python-dev libjpeg62-turbo libjpeg62-turbo-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip sudo -qy
 RUN pip install pillow
 RUN git clone https://github.com/styxit/HTPC-Manager /opt/htpc
 
@@ -23,7 +23,7 @@ RUN chmod u+rw ${CONFIGDIR}
 VOLUME ${CONFIGDIR}
 EXPOSE ${SERVERPORT}
 
-USER ${USER}
+#USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/htpc/Htpc.py", "--datadir=xxxx"]
+ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/htpc/Htpc.py", "--datadir=xxxx"]
 

@@ -6,7 +6,7 @@ TimeoutStartSec=0
 Restart=always
 ExecStartPre=-/usr/bin/docker stop mylar
 ExecStartPre=-/usr/bin/docker rm mylar
-ExecStart=/usr/bin/docker run -v /etc/downloaders/mylar:/etc/downloaders/mylar -v /media:/media -p 9004:9004 --name=mylar mylar
+ExecStart=/usr/bin/docker run -v /etc/downloaders/mylar:/etc/downloaders/mylar -v /media:/media /etc/localtime:/etc/localtime:ro -p 9004:9004 --name=mylar mylar
 ExecStop=/usr/bin/docker stop mylar
 
 [Install]

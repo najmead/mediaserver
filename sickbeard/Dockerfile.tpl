@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -12,7 +12,7 @@ ENV DATADIR xxxx
 RUN apt-get -q update && apt-get -qy --force-yes dist-upgrade
 
 ## Install pre-requisites
-RUN apt-get install -y git-core python-cheetah
+RUN apt-get install -y git-core python-cheetah sudo
 
 ## Download sickbeard source
 RUN git clone git://github.com/midgetspy/Sick-Beard.git /opt/sickbeard
@@ -28,6 +28,6 @@ VOLUME ${CONFIGDIR}
 VOLUME ${DATADIR}
 EXPOSE ${SICKBEARDPORT}
 
-USER ${USER}
+#USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/sickbeard/SickBeard.py", "--datadir=xxxx"]
+ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/sickbeard/SickBeard.py", "--datadir=xxxx"]

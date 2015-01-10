@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -10,7 +10,7 @@ ENV DATADIR xxxx
 
 RUN apt-get -q update && apt-get -qy --force-yes dist-upgrade
 
-RUN apt-get -qy install git python psmisc
+RUN apt-get -qy install git python psmisc sudo
 
 RUN git clone https://github.com/RuudBurger/CouchPotatoServer.git /opt/couchpotato
 
@@ -23,7 +23,7 @@ VOLUME ${CONFIGDIR}
 VOLUME ${DATADIR}
 EXPOSE ${SERVERPORT}
 
-USER ${USER}
+#USER ${USER}
 
-ENTRYPOINT ["/usr/bin/python", "/opt/couchpotato/CouchPotato.py", "--data_dir=xxxx"]
+ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/couchpotato/CouchPotato.py", "--data_dir=xxxx"]
 

@@ -85,7 +85,7 @@ else
 	echo "Customising ${USER}.service"
 	cp Service.tpl ${USER}.service
 	sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
-	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# ${USER}.service
+	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# ${USER}.service
 	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
 	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
 	echo "Copying file to /etc/systemd/system"

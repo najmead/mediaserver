@@ -55,7 +55,7 @@ else
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 
 	#Customising ENTRYPOINT
-	sed -i s#--user=xxxx#==user=${USER}# Dockerfile
+	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
 	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .

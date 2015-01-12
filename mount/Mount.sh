@@ -14,7 +14,7 @@ do
 	then
 		echo "Found disk ${f}, but it is already in fstab."
 	else
-		echo "Found fisk ${f}, and it's not listed in fstab."
+		echo "Found disk ${f}, and it's not listed in fstab."
 		fs=$(blkid -o value -s TYPE /dev/disk/by-uuid/${f})
 		if [ ! -d "/media/$f" ];
 		then
@@ -22,8 +22,9 @@ do
 			mkdir /media/${f}
 		fi
 		echo "Mounting it in /media/${f}"
-##		mount -t ${fs} --source UUID=${f} --target /media/${f}
-		echo "UUID=${f} /media/${f} ${fs}  errors=remount-ro 0 1" >> /etc/fstab
+		mount -t ${fs} --source UUID=${f} --target /media/${f}		
+##		echo "UUID=${f} /media/${f} ${fs}  errors=remount-ro 0 1" >> /etc/fstab
+		mounts="${mounts}UUID=${f} /media/${f} ${fs} defaults,nofail,errors=remount-ro 0 1 \n"
 		echo "Checking subdirectories"
 		BINDS=$(ls -I lost* /media/${f})
 		for exp in $BINDS
@@ -35,7 +36,8 @@ do
 				then
 					mkdir -p /export/${exp}
 				fi
-				echo "/media/${f}/${exp} /export/${exp} none bind 0 0" >> /etc/fstab
+				exports="${exports}/media/${f}/${exp} /export/${exp} none bind 0 0 \n"
+##				echo "/media/${f}/${exp} /export/${exp} none bind 0 0" >> /etc/fstab
 ##				mount --bind /media/${f}/${exp} /export/${exp}
 			else
 				echo "Found ${exp}, but it looks like a file so I'll ignore it."
@@ -43,3 +45,6 @@ do
 		done
 	fi
 done
+
+echo -e ${mounts} >> /etc/fstab
+echo -e ${exports}  >> /etc/fstab

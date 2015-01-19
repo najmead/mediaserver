@@ -26,7 +26,7 @@ if [ $? -eq 0 ]; then
 	echo "User $USER already exists, no need to create."
 else
 	echo "User $USER does not exist, creating it..."
-	useradd -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	useradd -r -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
 fi
 
 if [ -d "$CONFIGDIR" ]; then

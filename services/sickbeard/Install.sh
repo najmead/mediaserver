@@ -77,26 +77,39 @@ else
 	sleep 60
 fi
 
-## Add systemd file
-if [ -e /etc/systemd/system/${USER}.service ]; then
-	echo "Service for ${USER} already exists."
+if [ $(ps -p 1 -o comm=) == "systemd" ];
+then
+	echo "Looks like you are running systemd, I'll try and create a service."
+
+	## Add systemd file
+	if [ -e /etc/systemd/system/${USER}.service ]; then
+		echo "Service for ${USER} already exists."
+	else
+		echo "Adding ${USER} service to systemd."
+		echo "Customising ${USER}.service"
+		cp Service.tpl ${USER}.service
+		sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
+		sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# ${USER}.service
+		sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
+		sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
+		echo "Copying file to /etc/systemd/system"
+		cp ${USER}.service /etc/systemd/system/
+		echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."
+		systemctl enable ${USER}
+		echo "Starting service."
+		systemctl start ${USER}
+		echo "Checking status."
+		systemctl status ${USER}
+	fi
 else
-	echo "Adding ${USER} service to systemd."
-	echo "Customising ${USER}.service"
-	cp Service.tpl ${USER}.service
-	sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
-	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SICKBEARDPORT}:${SICKBEARDPORT}\ --name=${USER}\ ${USER}# ${USER}.service
-	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
-	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
-	echo "Copying file to /etc/systemd/system"
-	cp ${USER}.service /etc/systemd/system/
-	echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."
-	systemctl enable ${USER}
-	echo "Starting service."
-	systemctl start ${USER}
-	echo "Checking status."
-	systemctl status ${USER}
+#docker run -v /etc/downloaders/sickbeard:/etc/downloaders/sickbeard 
+#-v /media:/media 
+#-v /etc/localtime:/etc/localtime:ro -p 9000:9000 --name=sickbeard sickbeard
+	echo "Not using systemd, I'll just run the container directly"
+docker run -v ${CONFIGDIR}:${CONFIGDIR} -v ${DATADIR}:${DATADIR} -v /etc/localtime:/etc/localtime:ro -p ${SICKBEARDPORT}:${SICKBEARDPORT} --name=${USER} -d --restart=always ${USER}
+
 fi
+
 
 ## Finish
 echo "Congratulations  You should now have ${USER} installed and configured."

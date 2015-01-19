@@ -79,28 +79,43 @@ else
 	sed -i s#http_port\ =\ 8181#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
 	sed -i s#http_root\ =\ \/#http_root\ =\ \/${URLBASE}# ${CONFIGDIR}/config.ini
 	echo "Snooze a little bit more so I can check some things."
-	sleep 60
+	sleep 5
+	docker rm ${TEMP_CONT}
 fi
 
-## Add systemd file
-if [ -e /etc/systemd/system/${USER}.service ]; then
-	echo "Service for ${USER} already exists."
+if [ $(ps -p 1 -o comm=) == "systemd" ];
+then
+	echo "Looks like you are running systemd, I'll try and create a service."
+
+	## Add systemd file
+	if [ -e /etc/systemd/system/${USER}.service ]; then
+		echo "Service for ${USER} already exists."
+	else
+		echo "Adding ${USER} service to systemd."
+		echo "Customising ${USER}.service"
+		cp Service.tpl ${USER}.service
+		sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
+		sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
+		sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
+		sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
+		echo "Copying file to /etc/systemd/system"
+		cp ${USER}.service /etc/systemd/system/
+		echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."
+		systemctl enable ${USER}
+		echo "Starting service."
+		systemctl start ${USER}
+		echo "Checking status."
+		systemctl status ${USER}
+	fi
 else
-	echo "Adding ${USER} service to systemd."
-	echo "Customising ${USER}.service"
-	cp Service.tpl ${USER}.service
-	sed -i s#Description=xxxx#Description=${USER}# ${USER}.service
-	sed -i s#ExecStart=xxxx#ExecStart=/usr/bin/docker\ run\ -v\ ${CONFIGDIR}:${CONFIGDIR}\ -v\ ${DATADIR}:${DATADIR}\ -v\ \/etc\/localtime:\/etc\/localtime:ro\ -p\ ${SERVERPORT}:${SERVERPORT}\ --name=${USER}\ ${USER}# ${USER}.service
-	sed -i s#stop\ xxxx#stop\ ${USER}#g ${USER}.service
-	sed -i s#rm\ xxxx#rm\ ${USER}#g ${USER}.service
-	echo "Copying file to /etc/systemd/system"
-	cp ${USER}.service /etc/systemd/system/
-	echo "Enabling service on startup.  Run systemctl disable ${USER} to disable."
-	systemctl enable ${USER}
-	echo "Starting service."
-	systemctl start ${USER}
-	echo "Checking status."
-	systemctl status ${USER}
+	echo "Not using systemd, I'll just run the container directly"
+	docker ps -a|grep -c "${USER}" > /dev/null
+	if [ $? -eq 0 ];
+	then
+		echo "Looks like there is a container called ${USER} already.  I won't touch it"
+	else
+		docker run -v ${CONFIGDIR}:${CONFIGDIR} -v ${DATADIR}:${DATADIR} -v /etc/localtime:/etc/localtime:ro -p ${SERVERPORT}:${SERVERPORT} --name=${USER} -d --restart=always ${USER}
+	fi
 fi
 
 echo "Congratulations  You should now have ${USER} installed and configured."

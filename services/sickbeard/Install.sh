@@ -106,10 +106,14 @@ else
 #-v /media:/media 
 #-v /etc/localtime:/etc/localtime:ro -p 9000:9000 --name=sickbeard sickbeard
 	echo "Not using systemd, I'll just run the container directly"
-docker run -v ${CONFIGDIR}:${CONFIGDIR} -v ${DATADIR}:${DATADIR} -v /etc/localtime:/etc/localtime:ro -p ${SICKBEARDPORT}:${SICKBEARDPORT} --name=${USER} -d --restart=always ${USER}
-
+	docker ps -a|grep -c "${USER}" > /dev/null
+	if [ $? -eq 0 ];
+	then
+		echo "Looks like there is a container called ${USER} already.  I won't touch it"
+	else
+		docker run -v ${CONFIGDIR}:${CONFIGDIR} -v ${DATADIR}:${DATADIR} -v /etc/localtime:/etc/localtime:ro -p ${SICKBEARDPORT}:${SICKBEARDPORT} --name=${USER} -d --restart=always ${USER}
+	fi
 fi
-
 
 ## Finish
 echo "Congratulations  You should now have ${USER} installed and configured."

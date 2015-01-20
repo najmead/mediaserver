@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM ubuntu:latest
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -29,7 +29,7 @@ VOLUME ${DATADIR}
 
 EXPOSE ${SERVERPORT}
 
-USER ${USER}
+#USER ${USER}
 
-ENTRYPOINT ["/usr/bin/mono", "/opt/NzbDrone/NzbDrone.exe", "-data=xxxx"]
+ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/mono", "/opt/NzbDrone/NzbDrone.exe", "-data=xxxx"]
 

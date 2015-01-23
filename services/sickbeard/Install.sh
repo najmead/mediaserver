@@ -74,7 +74,8 @@ else
 	sed -i s#web_port\ =\ 8081#web_port\ =\ ${SICKBEARDPORT}# ${CONFIGDIR}/config.ini
 	sed -i s#web_root\ =\ \"\"#web_root\ =\ \"\/${URLBASE}\"# ${CONFIGDIR}/config.ini
 	echo "Snooze a little bit more"
-	sleep 60
+	sleep 5
+	docker rm ${TEMP_CONT}
 fi
 
 if [ $(ps -p 1 -o comm=) == "systemd" ];

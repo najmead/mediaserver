@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:wheezy
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
@@ -33,6 +33,10 @@ VOLUME ${DATADIR}
 EXPOSE ${SERVERPORT}
 
 #USER ${USER}
+RUN echo "sudo -u ${USER} /usr/bin/python /opt/sabnzbd/SABnzbd.py --config-file=${CONFIGDIR} --server :${SERVERPORT}" >> /opt/sabnzbd/Start.sh
+RUN chmod +x /opt/sabnzbd/Start.sh
 
-ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/sabnzbd/SABnzbd.py", "--config-file=xxxx", "--server", ":xxxx"]
+ENTRYPOINT ["/opt/sabnzbd/Start.sh"]
+
+#ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/sabnzbd/SABnzbd.py", "--config-file=xxxx", "--server", ":xxxx"]
 

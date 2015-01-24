@@ -57,9 +57,9 @@ else
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 	
 	## Customise ENTRYPOINT in Dockerfile
-	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
-	sed -i s#--config-file=xxxx#--config-file=${CONFIGDIR}# Dockerfile
-	sed -i s#\:xxxx#\:${SERVERPORT}# Dockerfile
+#	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
+#	sed -i s#--config-file=xxxx#--config-file=${CONFIGDIR}# Dockerfile
+#	sed -i s#\:xxxx#\:${SERVERPORT}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi

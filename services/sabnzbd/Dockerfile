@@ -1,13 +1,13 @@
 FROM debian:wheezy
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
-ENV GROUP xxxx
-ENV GROUPID xxxx
-ENV USER xxxx
-ENV USERID xxxx
-ENV SERVERPORT xxxx
-ENV CONFIGDIR xxxx
-ENV DATADIR xxxx
+ENV GROUP media
+ENV GROUPID 10000
+ENV USER sabtest
+ENV USERID 997
+ENV SERVERPORT 8000
+ENV CONFIGDIR /etc/downloaders/sabtest
+ENV DATADIR /media
 
 ## Prepare dependencies and then cleanup
 RUN echo "deb http://http.debian.net/debian wheezy non-free" >> /etc/apt/sources.list.d/debian-nonfree.list

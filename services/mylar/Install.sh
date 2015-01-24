@@ -2,32 +2,33 @@
 
 ############# Set some parameters #############
 GROUP="media"
-GROUPID="10000"
 USER="mylar"
 SERVERPORT="9004"
 URLBASE="mylar"
 CONFIGDIR="/etc/downloaders/${USER}"
 DATADIR="/media"
 ###############################################
-
 ## Check to see if group exists, if not, create it.
 getent group "${GROUP}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "Group $GROUP already exists, no need to create."
+	GROUPID="$(getent group ${GROUP} | cut -d: -f3)"
+	echo "Group $GROUP with gid ${GROUPID} already exists, no need to create."
 else
 	echo "Group $GROUP does not exist, so creating it..."
-	groupadd -g ${GROUPID} ${GROUP}
+	groupadd -r ${GROUP}
+	GROUPDID="$(getent group ${GROUP} | cut -d: -f3)"
 fi
 
 echo	"Setting up user $USER"
-
-## Check to see if user exists, if not, create it.
 getent passwd "${USER}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "User $USER already exists, no need to create."
+	USERID="$(id -u ${USER})"
+	echo "User $USER with uid ${USERID} already exists, no need to create."
+
 else
 	echo "User $USER does not exist, creating it..."
-	useradd -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	useradd -r -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	USERID="$(id -u ${USER})"
 fi
 
 if [ -d "$CONFIGDIR" ]; then
@@ -48,19 +49,16 @@ else
 	echo "Docker image doesn't exist, creating it..."
 	echo "Customising Dockerfile"
 	cp Dockerfile.tpl Dockerfile
-	
+
 	## Set environment variables in Dockerfile
 	sed -i s#ENV\ USER\ xxxx#ENV\ USER\ ${USER}# Dockerfile
+	sed -i s#ENV\ USERID\ xxxx#ENV\ USERID\ ${USERID}# Dockerfile
 	sed -i s#ENV\ SERVERPORT\ xxxx#ENV\ SERVERPORT\ ${SERVERPORT}# Dockerfile
 	sed -i s#ENV\ CONFIGDIR\ xxxx#ENV\ CONFIGDIR\ ${CONFIGDIR}# Dockerfile
 	sed -i s#ENV\ DATADIR\ xxxx#ENV\ DATADIR\ ${DATADIR}# Dockerfile
 	sed -i s#ENV\ GROUP\ xxxx#ENV\ GROUP\ ${GROUP}# Dockerfile
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
-	
-	## Customise ENTRYPOINT in Dockerfile
-	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
-	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
-	sed -i s#--port=xxxx#--port=${SERVERPORT}# Dockerfile
+
 	echo "Building image"
 	docker build -t "${USER}" .
 fi

@@ -1,9 +1,10 @@
-FROM debian:jessie
+FROM debian:wheezy
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
 ENV GROUPID xxxx
 ENV USER xxxx
+ENV USERID xxxx
 ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 ENV DATADIR xxxx
@@ -16,7 +17,7 @@ RUN apt-get clean &&\
 
 RUN git clone https://github.com/evilhero/mylar /opt/mylar
 
-RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} ${USER}
+RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${USERID} -s /usr/sbin/nologin -g ${GROUP} ${USER}
 RUN chown -R ${USER}:${GROUP} /opt/mylar
 RUN mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
 RUN chmod u+rw ${CONFIGDIR}
@@ -27,5 +28,9 @@ VOLUME ${DATADIR}
 EXPOSE ${SERVERPORT}
 
 #USER ${USER}
+RUN echo "#!/bin/bash" >> /opt/mylar/Start.sh
+RUN echo "sudo -u ${USER} /usr/bin/python /opt/mylar/Mylar.py --datadir=${CONFIGDIR}" >> /opt/mylar/Start.sh
+RUN chmod +x /opt/mylar/Start.sh
 
-ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/mylar/Mylar.py", "--port=xxxx", "--datadir=xxxx"]
+CMD ["/opt/mylar/Start.sh"]
+

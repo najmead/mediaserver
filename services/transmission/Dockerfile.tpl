@@ -4,6 +4,7 @@ MAINTAINER Nicholas Mead <najmead@gmail.com>
 ENV GROUP xxxx
 ENV GROUPID xxxx
 ENV USER xxxx
+ENV USERID xxxx
 ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 ENV DATADIR xxxx
@@ -14,7 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\
 	rm -rf /tmp/*
 
-RUN DEBIAN_FRONTEND=noninteractive groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} ${USER}
+RUN DEBIAN_FRONTEND=noninteractive groupadd -g ${GROUPID} ${GROUP} && useradd -u ${USERID} -s /usr/sbin/nologin -g ${GROUP} ${USER}
 RUN DEBIAN_FRONTEND=noninteractive mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
 RUN DEBIAN_FRONTEND=noninteractive chmod u+rw ${CONFIGDIR}
 
@@ -25,6 +26,10 @@ VOLUME ${DATADIR}
 ## Expose the port sabnzbd will run on
 EXPOSE ${SERVERPORT}
 
-#USER ${USER}
+## Generate start script
+RUN echo "#!/bin/bash" >> /Start.sh
+RUN echo "sudo -u ${USER} transmission-daemon --config-dir=${CONFIGDIR} --foreground" >> /Start.sh
+RUN chmod +x /Start.sh
 
-ENTRYPOINT ["sudo", "--user=xxxx", "transmission-daemon", "--config-dir=xxxx", "--foreground"]
+CMD ["/Start.sh"]
+

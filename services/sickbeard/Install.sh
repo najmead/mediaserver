@@ -13,21 +13,24 @@ DATADIR="/media"
 ## Check to see if group exists, if not, create it.
 getent group "${GROUP}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "Group $GROUP already exists, no need to create."
+	GROUPID="$(getent group ${GROUP} | cut -d: -f3)"
+	echo "Group $GROUP with gid ${GROUPID} already exists, no need to create."
 else
 	echo "Group $GROUP does not exist, so creating it..."
-	groupadd -g ${GROUPID} ${GROUP}
+	groupadd -r ${GROUP}
+	GROUPDID="$(getent group ${GROUP} | cut -d: -f3)"
 fi
 
 echo	"Setting up user $USER"
-
-## Check to see if user exists, if not, create it.
 getent passwd "${USER}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "User $USER already exists, no need to create."
+	USERID="$(id -u ${USER})"
+	echo "User $USER with uid ${USERID} already exists, no need to create."
+
 else
 	echo "User $USER does not exist, creating it..."
-	useradd -u ${SICKBEARDPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	useradd -r -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	USERID="$(id -u ${USER})"
 fi
 
 if [ -d "$CONFIGDIR" ]; then
@@ -48,18 +51,17 @@ else
 	echo "Customising Dockerfile"
 	cp Dockerfile.tpl Dockerfile
 	sed -i s#ENV\ USER\ xxxx#ENV\ USER\ ${USER}# Dockerfile
+	sed -i s#ENV\ USERID\ xxxx#ENV\ USERID\ ${USERID}# Dockerfile
 	sed -i s#ENV\ SICKBEARDPORT\ xxxx#ENV\ SICKBEARDPORT\ ${SICKBEARDPORT}# Dockerfile
 	sed -i s#ENV\ CONFIGDIR\ xxxx#ENV\ CONFIGDIR\ ${CONFIGDIR}# Dockerfile
 	sed -i s#ENV\ DATADIR\ xxxx#ENV\ DATADIR\ ${DATADIR}# Dockerfile
 	sed -i s#ENV\ GROUP\ xxxx#ENV\ GROUP\ ${GROUP}# Dockerfile
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 
-	#Customising ENTRYPOINT
-	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
-	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
+
 if [ -e ${CONFIGDIR}/config.ini ]; then
 	echo "Config file already exists.  Double check that the port listed in the config matches specified port, ${SICKBEARPORT}."
 else
@@ -70,12 +72,20 @@ else
 	sleep 10
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
-	echo "Replace the default port with ${SICKBEARDPORT}."
-	sed -i s#web_port\ =\ 8081#web_port\ =\ ${SICKBEARDPORT}# ${CONFIGDIR}/config.ini
-	sed -i s#web_root\ =\ \"\"#web_root\ =\ \"\/${URLBASE}\"# ${CONFIGDIR}/config.ini
 	echo "Snooze a little bit more"
 	sleep 5
 	docker rm ${TEMP_CONT}
+	if [ -e ${CONFIGDIR}/config.ini ]; then
+		echo "Replace the default port with ${SICKBEARDPORT}."
+		sed -i s#web_port\ =\ 8081#web_port\ =\ ${SICKBEARDPORT}# ${CONFIGDIR}/config.ini
+		sed -i s#web_root\ =\ \"\"#web_root\ =\ \"\/${URLBASE}\"# ${CONFIGDIR}/config.ini
+	else
+		echo "Running temporarily hasn't generated a config.  I'll just inject data instead."
+		echo "[General]" >> ${CONFIGDIR}/config.ini
+		echo "web_port = ${SICKBEARDPORT}" >> ${CONFIGDIR}/config.ini
+		echo "web_root = /${URLBASE}" >> ${CONFIGDIR}/config.ini
+		chown ${USER}:${GROUP} ${CONFIGDIR}/config.ini
+	fi
 fi
 
 if [ $(ps -p 1 -o comm=) == "systemd" ];
@@ -103,9 +113,6 @@ then
 		systemctl status ${USER}
 	fi
 else
-#docker run -v /etc/downloaders/sickbeard:/etc/downloaders/sickbeard 
-#-v /media:/media 
-#-v /etc/localtime:/etc/localtime:ro -p 9000:9000 --name=sickbeard sickbeard
 	echo "Not using systemd, I'll just run the container directly"
 	docker ps -a|grep -c "${USER}" > /dev/null
 	if [ $? -eq 0 ];

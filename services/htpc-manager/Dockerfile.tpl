@@ -1,20 +1,21 @@
-FROM debian:jessie
+FROM debian:wheezy
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx
 ENV GROUPID xxxx
 ENV USER xxxx
+ENV USERID xxxx
 ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 
 ## Take care of dependencies
 RUN apt-get update && apt-get -qy --force-yes dist-upgrade
-RUN apt-get install git python2.7 python-dev libjpeg62-turbo libjpeg62-turbo-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip sudo -qy
+RUN apt-get install git python2.7 python-dev libjpeg8 libjpeg8-dev libpng12-dev libfreetype6 libfreetype6-dev zlib1g-dev python-pip sudo -qy
 RUN pip install pillow
 RUN git clone https://github.com/styxit/HTPC-Manager /opt/htpc
 
 ## Add a htpc user and media group
-RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} ${USER}
+RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${USERID} -s /usr/sbin/nologin -g ${GROUP} ${USER}
 RUN chown -R ${USER}:${GROUP} /opt/htpc
 RUN mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
 RUN chmod u+rw ${CONFIGDIR}
@@ -23,7 +24,9 @@ RUN chmod u+rw ${CONFIGDIR}
 VOLUME ${CONFIGDIR}
 EXPOSE ${SERVERPORT}
 
-#USER ${USER}
 
-ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/python", "/opt/htpc/Htpc.py", "--datadir=xxxx"]
+RUN echo "#!/bin/bash" >> /opt/htpc/Start.sh
+RUN echo "sudo -u ${USER} /usr/bin/python /opt/htpc/Htpc.py --datadir=${CONFIGDIR}" >> /opt/htpc/Start.sh
+RUN chmod +x /opt/htpc/Start.sh
 
+CMD ["/opt/htpc/Start.sh"]

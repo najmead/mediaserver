@@ -4,6 +4,7 @@ MAINTAINER Nicholas Mead <najmead@gmail.com>
 ENV GROUP xxxx
 ENV GROUPID xxxx
 ENV USER xxxx
+ENV USERID xxxx
 ENV SERVERPORT xxxx
 ENV CONFIGDIR xxxx
 ENV DATADIR xxxx
@@ -18,7 +19,7 @@ RUN apt-get clean &&\
 	rm -rf /tmp/*
 
 RUN mkdir -p ${CONFIGDIR}
-RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${SERVERPORT} -s /usr/sbin/nologin -g ${GROUP} -d ${CONFIGDIR} ${USER}
+RUN groupadd -g ${GROUPID} ${GROUP} && useradd -u ${USERID} -s /usr/sbin/nologin -g ${GROUP} -d ${CONFIGDIR} ${USER}
 RUN chown -R ${USER}:${GROUP} /opt/NzbDrone
 RUN mkdir -p ${CONFIGDIR} && chown -R ${USER}:${GROUP} ${CONFIGDIR}
 RUN chmod u+rw ${CONFIGDIR}
@@ -29,7 +30,8 @@ VOLUME ${DATADIR}
 
 EXPOSE ${SERVERPORT}
 
-#USER ${USER}
+RUN echo "#!/bin/bash" >> /opt/NzbDrone/Start.sh
+RUN echo "sudo -u ${USER} /usr/bin/mono /opt/NzbDrone.exe -date=${CONFIGDIR}" >> /opt/NzbDrone/Start.sh
+RUN chmod +x /opt/NzbDrone/Start.sh
 
-ENTRYPOINT ["sudo", "--user=xxxx", "/usr/bin/mono", "/opt/NzbDrone/NzbDrone.exe", "-data=xxxx"]
-
+CMD ["/opt/NzbDrone/Start.sh"]

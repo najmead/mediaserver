@@ -16,7 +16,7 @@ if [ $? -eq 0 ]; then
 else
 	echo "Group $GROUP does not exist, so creating it..."
 	groupadd -r ${GROUP}
-	GROUPDID="$(getent group ${GROUP} | cut -d: -f3)"
+	GROUPID="$(getent group ${GROUP} | cut -d: -f3)"
 fi
 
 ## Check to see if user exists, if not, create it.

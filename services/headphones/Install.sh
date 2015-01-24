@@ -11,12 +11,15 @@ DATADIR="/media"
 ###############################################
 
 ## Check to see if group exists, if not, create it.
+## Check to see if group exists, if not, create it.
 getent group "${GROUP}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "Group $GROUP already exists, no need to create."
+	GROUPID="$(getent group ${GROUP} | cut -d: -f3)"
+	echo "Group $GROUP with gid ${GROUPID} already exists, no need to create."
 else
 	echo "Group $GROUP does not exist, so creating it..."
-	groupadd -g ${GROUPID} ${GROUP}
+	groupadd -r ${GROUP}
+	GROUPDID="$(getent group ${GROUP} | cut -d: -f3)"
 fi
 
 echo	"Setting up user $USER"
@@ -24,10 +27,13 @@ echo	"Setting up user $USER"
 ## Check to see if user exists, if not, create it.
 getent passwd "${USER}" > /dev/null
 if [ $? -eq 0 ]; then
-	echo "User $USER already exists, no need to create."
+	USERID="$(id -u ${USER})"
+	echo "User $USER with uid ${USERID} already exists, no need to create."
+
 else
 	echo "User $USER does not exist, creating it..."
-	useradd -u ${SERVERPORT} -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	useradd -r -g "${GROUP}" -s /usr/bin/nologin -d "$CONFIGDIR" "${USER}"
+	USERID="$(id -u ${USER})"
 fi
 
 if [ -d "$CONFIGDIR" ]; then
@@ -50,15 +56,13 @@ else
 
 	## Set environment variables in Dockerfile
 	sed -i s#ENV\ USER\ xxxx#ENV\ USER\ ${USER}# Dockerfile
+	sed -i s#ENV\ USERID\ xxxx#ENV\ USERID\ ${USERID}# Dockerfile
 	sed -i s#ENV\ SERVERPORT\ xxxx#ENV\ SERVERPORT\ ${SERVERPORT}# Dockerfile
 	sed -i s#ENV\ CONFIGDIR\ xxxx#ENV\ CONFIGDIR\ ${CONFIGDIR}# Dockerfile
 	sed -i s#ENV\ DATADIR\ xxxx#ENV\ DATADIR\ ${DATADIR}# Dockerfile
 	sed -i s#ENV\ GROUP\ xxxx#ENV\ GROUP\ ${GROUP}# Dockerfile
 	sed -i s#ENV\ GROUPID\ xxxx#ENV\ GROUPID\ ${GROUPID}# Dockerfile
 
-	## Customise ENTRYPOINT in Dockerfile
-	sed -i s#--user=xxxx#--user=${USER}# Dockerfile
-	sed -i s#--datadir=xxxx#--datadir=${CONFIGDIR}# Dockerfile
 	echo "Building image"
 	docker build -t "${USER}" .
 fi
@@ -75,12 +79,22 @@ else
 	sleep 10
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
-	echo "Replace the default port with ${SERVERPORT}, and set url base to ${URLBASE}"
-	sed -i s#http_port\ =\ 8181#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
-	sed -i s#http_root\ =\ \/#http_root\ =\ \/${URLBASE}# ${CONFIGDIR}/config.ini
-	echo "Snooze a little bit more so I can check some things."
 	sleep 5
 	docker rm ${TEMP_CONT}
+
+	if [ -e ${CONFIGDIR}/config.ini ]; then
+
+		echo "Replace the default port with ${SERVERPORT}, and set url base to ${URLBASE}"
+		sed -i s#http_port\ =\ 8181#http_port\ =\ ${SERVERPORT}# ${CONFIGDIR}/config.ini
+		sed -i s#http_root\ =\ \/#http_root\ =\ \/${URLBASE}# ${CONFIGDIR}/config.ini
+		echo "Snooze a little bit more so I can check some things."
+	else
+		echo "Temporarily running the container didn't generate a config file.  I'll just inject the configs"
+		echo "[General]" >> ${CONFIGDIR}/config.ini
+		echo "http_port = ${SERVERPORT}" >> ${CONFIGDIR}/config.ini
+		echo "http_root = /${URLBASE}" >> ${CONFIGDIR}/config.ini
+		chown ${USER}:${GROUP} ${CONFIGDIR}/config.ini
+	fi
 fi
 
 if [ $(ps -p 1 -o comm=) == "systemd" ];

@@ -68,8 +68,8 @@ else
 fi
 
 ## Customise config for port
-if [  -e ${CONFIGDIR}/.config/NzbDrone/config.xml ]; then
-	echo "Config already exists in ${CONFIGDIR}/.config/NzbDrone/config.xml so I won't touch it.  Double check that the port in the config matches the specified port ${SERVERPORT}"
+if [  -e ${CONFIGDIR}/config.xml ]; then
+	echo "Config already exists in ${CONFIGDIR} so I won't touch it.  Double check that the port in the config matches the specified port ${SERVERPORT}"
 else
 	TEMP_CONT=$RANDOM
 	echo "Running ${USER} in a temporary container ( ${TEMP_CONT} ) for the first time to generate configs."
@@ -79,8 +79,8 @@ else
 	echo "Ok, now let's stop the temporary container ( ${TEMP_CONT} )"
 	docker stop ${TEMP_CONT}
 	echo "Replace the default port with ${SERVERPORT}."
-	sed -i s#\<Port\>8989#\<Port\>${SERVERPORT}# ${CONFIGDIR}/.config/NzbDrone/config.xml 
-	sed -i s#\<UrlBase\>#\<UrlBase\>${URLBASE}# ${CONFIGDIR}/.config/NzbDrone/config.xml
+	sed -i s#\<Port\>8989#\<Port\>${SERVERPORT}# ${CONFIGDIR}/config.xml 
+	sed -i s#\<UrlBase\>#\<UrlBase\>${URLBASE}# ${CONFIGDIR}/config.xml
 	echo "Snooze a little bit more"
 	sleep 10
 	docker rm ${TEMP_CONT}

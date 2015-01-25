@@ -31,7 +31,7 @@ VOLUME ${DATADIR}
 EXPOSE ${SERVERPORT}
 
 RUN echo "#!/bin/bash" >> /opt/NzbDrone/Start.sh
-RUN echo "sudo -u ${USER} /usr/bin/mono /opt/NzbDrone.exe -date=${CONFIGDIR}" >> /opt/NzbDrone/Start.sh
+RUN echo "sudo -u ${USER} /usr/bin/mono /opt/NzbDrone/NzbDrone.exe -data=${CONFIGDIR}" >> /opt/NzbDrone/Start.sh
 RUN chmod +x /opt/NzbDrone/Start.sh
 
 CMD ["/opt/NzbDrone/Start.sh"]

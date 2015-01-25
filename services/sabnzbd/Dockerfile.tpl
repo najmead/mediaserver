@@ -12,7 +12,7 @@ ENV DATADIR xxxx
 ## Prepare dependencies and then cleanup
 RUN echo "deb http://http.debian.net/debian wheezy non-free" >> /etc/apt/sources.list.d/debian-nonfree.list
 RUN apt-get update && apt-get upgrade -qy
-RUN apt-get install python-cheetah par2 python-yenc unzip unrar git python-openssl sudo -qy
+RUN apt-get install python-cheetah par2 python-yenc unzip unrar git python-openssl p7zip-full sudo -qy
 RUN apt-get clean &&\
 	rm -rf /var/lib/apt/lists/* &&\
 	rm -rf /tmp/*

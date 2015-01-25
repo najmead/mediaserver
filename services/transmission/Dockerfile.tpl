@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:wheezy
 MAINTAINER Nicholas Mead <najmead@gmail.com>
 
 ENV GROUP xxxx

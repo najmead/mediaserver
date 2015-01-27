@@ -1,0 +1,117 @@
+#!/bin/bash
+## Set some parameters
+TV_DIR=/export/TVShows
+
+VERSION=0.1
+
+## Check if sqlite3 is installed
+s=$(which sqlite3 > /dev/null;echo $?)
+if [ $s -eq 0 ]; then
+	echo "Already have sqlite3 installed"
+else
+	echo "You don't have sqlite3 installed, I'll install it"
+	apt-get update && apt-get install sqlite3 -qy
+fi
+
+## If database not present, initialise it
+if [ ! -e data.db ];
+then
+	create="create table version(id INTEGER PRIMARY KEY, version TEXT);"
+	sqlite3 data.db "${create}"
+	insert="insert into version(version) values ('${VERSION}');"
+	sqlite3 data.db "${insert}"
+fi
+
+## Create movies table
+tb_exists=`sqlite3 data.db "select exists (select * from sqlite_master where type='table' and name='movies');"`
+if [ $tb_exists -eq 0 ];
+then
+	create="create table movies(id INTEGER PRIMARY KEY, tt TEXT UNIQUE, title TEXT, year NUMERIC, plot TEXT, create_dt TEXT);"
+	sqlite3 data.db "${create}"
+fi
+
+## Create TV tables
+tb_exists=`sqlite3 data.db "select exists (select * from sqlite_master where type='table' and name='tvshow');"`
+if [ $tb_exists -eq 0 ];
+then
+	create="create table tvshow(id INTEGER PRIMARY KEY,tt TEXT UNIQUE, title TEXT, year NUMERIC, plot TEXT, create_dt TEXT);"
+	sqlite3 data.db "${create}"
+fi
+tb_exists=`sqlite3 data.db "select exists (select * from sqlite_master where type='table' and name='episode');"`
+if [ $tb_exists -eq 0 ];
+then
+	create="create table episode(id INTEGER PRIMARY KEY, tt TEXT UNIQUE, showtt TEXT, season NUMERIC, episode NUMERIC, name TEXT, plot TEXT, create_dt TEXT);"
+	sqlite3 data.db "${create}"
+fi
+	
+## Create run log
+tb_exists=`sqlite3 data.db "select exists (select * from sqlite_master where type='table' and name='log');"`
+if [ $tb_exists -eq 0 ];
+then
+	create="create table log(id INTEGER PRIMARY KEY, type TEXT, run_dt TEXT);"
+	sqlite3 data.db "${create}"
+	insert="insert into log (type, run_dt) values ('tvshows', CURRENT_TIMESTAMP);"
+	sqlite3 data.db "${insert}"	
+	insert="insert into log(type, run_dt) values ('movies', CURRENT_TIMESTAMP);"
+fi
+
+
+## Scan for new movies
+## Iterate over movies directory
+shopt -s globstar
+
+for m in $TV_DIR/A*/**/*.nfo
+do
+	file=$(basename "${m}")
+	if [ "${file}" == "tvshow.nfo" ];
+	then
+		## Get imdb id
+		tt=$(grep -oPm1 "(?<=<id>)[^<]+" <<< more "${m}")
+		title=$(grep -oPm1 "(?<=<title>)[^<]+" <<< more "${m}")
+		plot=$(grep -oPm1 "(?<=<plot>)[^<]+" <<< more "${m}")
+		#echo ${tt}
+		#echo ${title}
+		#echo ${plot}
+		insert="insert or ignore into tvshow(tt,title,plot,create_dt) values('${tt}', '${title//\'/&/#39;}','${plot//\'/&/#39;}',CURRENT_TIMESTAMP);"
+		sqlite3 data.db "${insert}"
+	else
+		tvshow=$(echo ${m} | awk -F"/" '{print $4}')
+		tvshow_nfo="${TV_DIR}/${tvshow}/tvshow.nfo"
+#		echo "${tvshow_nfo}"
+		tt=$(grep -oPm1 "(?<=<id>)[^<]+" <<< more "${tvshow_nfo}")
+		episode=$(grep -oPm1 "(?<=<episode>)[^<]+" <<< more "${m}")
+		season=$(grep -oPm1 "(?<=<season>)[^<]+" <<< more "${m}")
+		title=$(grep -oPm1 "(?<=<title>)[^<]+" <<< more "${m}")
+		plot=$(grep -oPm1 "(?<=<plot>)[^<]+" <<< more "${m}")
+#		echo "${tvshow}"
+		echo "${tvshow} - ${season}x${episode} - ${title}"
+		insert="insert or ignore into episode(showtt, season, episode, name, plot) values ('${tt}', '${season}', '${episode}', '${name//\'/&/#39;}', '${plot//\'/&/#39;}');"
+		sqlite3 data.db "${insert}"
+	fi
+done
+
+
+
+## Prepare a list of updates
+LAST_RUN=`sqlite3 data.db "SELECT MAX(strftime('%s', run_dt)) from log where type='tvshows';"`
+
+if [ -f tv_updates.html ];
+then
+	rm tv_updates.html
+fi
+
+echo "Last run $LAST_RUN"
+NEW_SHOWS=`sqlite3 data.db "select tvshow.tt from tvshow inner join episode on tvshow.tt = episode.showtt where strftime('%s', tvshow.create_dt) > '${LAST_RUN}' group by tvshow.tt;"`
+#UPDATES=`sqlite3 data.db "SELECT tt FROM MOVIES WHERE strftime('%s', create_dt) > '${LAST_RUN}';"`
+if [ ! -z "$NEW_SHOWS" ];
+then
+	echo "${NEW_SHOWS}"
+else
+	echo "No new updates"
+fi
+
+## LOG timestamp of run
+# log="insert into log(type, run_dt) values ('movies', CURRENT_TIMESTAMP);"
+#sqlite3 data.db "${log}"
+
+

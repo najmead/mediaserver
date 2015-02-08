@@ -2,12 +2,12 @@
 
 ############# Set some parameters #############
 GROUP="media"
-GROUPID="10000"
+#GROUPID="10000"
 USER="headphones"
-SERVERPORT="9003"
+SERVERPORT="8083"
 URLBASE="headphones"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export"
 ###############################################
 
 ## Check to see if group exists, if not, create it.

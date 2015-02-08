@@ -3,10 +3,10 @@
 ############# Set some parameters #############
 GROUP="media"
 USER="mylar"
-SERVERPORT="9004"
+SERVERPORT="8084"
 URLBASE="mylar"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export"
 ###############################################
 ## Check to see if group exists, if not, create it.
 getent group "${GROUP}" > /dev/null

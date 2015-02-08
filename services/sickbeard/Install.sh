@@ -4,10 +4,10 @@
 GROUP="media"
 GROUPID="10000"
 USER="sickbeard"
-SICKBEARDPORT="9000"
+SICKBEARDPORT="8081"
 URLBASE="sickbeard"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export"
 ###############################################
 
 ## Check to see if group exists, if not, create it.

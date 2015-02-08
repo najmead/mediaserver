@@ -3,10 +3,10 @@
 ############# Set some parameters #############
 GROUP="media"
 USER="couchpotato"
-SERVERPORT="9002"
+SERVERPORT="8082"
 URLBASE="cp"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export"
 ###############################################
 
 ## Check to see if group exists, if not, create it.

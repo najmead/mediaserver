@@ -3,9 +3,9 @@
 ############# Set some parameters #############
 GROUP="media"
 USER="sabnzbd"
-SERVERPORT="8000"
+SERVERPORT="8080"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export/"
 ###############################################
 
 ## Check to see if group exists, if not, create it.

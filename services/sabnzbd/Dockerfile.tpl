@@ -16,7 +16,7 @@ RUN apt-key adv --keyserver hkp://pool.sks-keyservers.net:11371 --recv-keys 0x98
 RUN apt-get update && apt-get upgrade -qy
 
 ## Install
-RUN apt-get -o APT::Install-Recommends=1 install sabnzbdplus unrar sudo -qy
+RUN apt-get -o APT::Install-Recommends=1 install sabnzbdplus sabnzbdplus-theme-mobile unrar sudo -qy
 
 RUN apt-get clean &&\
         rm -rf /var/lib/apt/lists/* &&\

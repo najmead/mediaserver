@@ -3,9 +3,9 @@
 ############# Set some parameters #############
 GROUP="media"
 USER="transmission"
-SERVERPORT="8002"
+SERVERPORT="9091"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export/Downloads"
 ###############################################
 
 ## Check to see if group exists, if not, create it.

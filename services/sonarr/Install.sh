@@ -3,10 +3,10 @@
 ############# Set some parameters #############
 GROUP="media"
 USER="sonarr"
-SERVERPORT="9001"
+SERVERPORT="8989"
 URLBASE="sonarr"
 CONFIGDIR="/etc/downloaders/${USER}"
-DATADIR="/media"
+DATADIR="/export/"
 ###############################################
 
 ## Check to see if group exists, if not, create it.
